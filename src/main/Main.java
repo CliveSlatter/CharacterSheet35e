@@ -1,3 +1,5 @@
+package Main;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -5,7 +7,7 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.sqlite.SQLiteConfig;
-
+import controllers.Character;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -14,14 +16,14 @@ public class Main {
     public static Connection db = null;
 
     public static void main(String[] args) {
-        openDatabase("things.db");
+        openDatabase("adnd35.db");
 
         ResourceConfig config = new ResourceConfig();
         config.packages("Controllers");
         config.register(MultiPartFeature.class);
         ServletHolder servlet = new ServletHolder(new ServletContainer(config));
 
-        Server server = new Server(8081);
+        Server server = new Server(8080);
         ServletContextHandler context = new ServletContextHandler(server, "/");
         context.addServlet(servlet, "/*");
 
