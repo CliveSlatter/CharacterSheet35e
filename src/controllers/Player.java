@@ -1,6 +1,7 @@
 package controllers;
 
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.json.simple.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Cookie;
@@ -33,8 +34,7 @@ public class Player {
             PreparedStatement ps = db.prepareStatement("SELECT username, salt, hash, sessionToken FROM user WHERE username = ?");
             ps.setString(1,username);
             ResultSet rs = ps.executeQuery();
-            System.out.println(rs.getInt("salt"));
-            String temp = GenerateHash(password,rs.getInt("salt"));
+            String temp = GenerateHash(password,rs.getBytes("salt"));
 
             if (rs != null && rs.next()) {
                 if (!temp.equals(rs.getString("hash"))) {
@@ -65,8 +65,8 @@ public class Player {
     public String addPlayer(  @FormDataParam("username") String username,
                              @FormDataParam("firstname") String firstname,
                              @FormDataParam("lastname") String lastname,
-                             @FormDataParam("password1") String password1,
-                             @CookieParam("sessionToken") Cookie sessionCookie) {
+                             @FormDataParam("password1") String password1)
+                             {
 
         try {
 
@@ -76,18 +76,23 @@ public class Player {
 
             System.out.println("/player/new username=" + username + " - Adding new player to database");
 
-            String currentUsername = ValidateSessionCookie(sessionCookie);
-            if (currentUsername == null) {
+            //String currentUsername = ValidateSessionCookie(sessionCookie);
+            /*if (currentUsername == null) {
                 return "{\"error\": \"Not logged in as valid player\"}";
-            }
+            }*/
+
             SecureRandom random = new SecureRandom();
             byte[] salt = new byte[16];
             random.nextBytes(salt);
+            String token = UUID.randomUUID().toString();
             System.out.println(salt);
             String hash = GenerateHash(password1,salt);
 
             PreparedStatement  ps = db.prepareStatement("INSERT INTO user (username, salt, hash, sessionToken) VALUES (?, ?, ?, ?)");
             ps.setString(1, username);
+            ps.setBytes(2,salt);
+            ps.setString(3,hash);
+            ps.setString(4,token);
             ps.executeUpdate();
 
             return "{\"status\": \"OK\"}";
@@ -119,8 +124,8 @@ public class Player {
         return null;
     }
 
-    public static String GenerateHash(String password, int salt) {
-        String hashSource = password + Integer.toString(salt);
+    public static String GenerateHash(String password, byte[] salt) {
+        String hashSource = password + salt;
         try {
             MessageDigest hasher = MessageDigest.getInstance("MD5");
             hasher.update(hashSource.getBytes());
@@ -130,5 +135,13 @@ public class Player {
             return nsae.getMessage();
         }
 
+    }
+
+    @GET
+    @Path("listCharacters")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String listCharacters(){
+        JSONObject jso = new JSONObject();
+        PreparedStatement ps = db.prepareStatement("SELECT")
     }
 }
