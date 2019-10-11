@@ -1,20 +1,18 @@
 package controllers;
 
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.DatatypeConverter;
-import java.awt.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.sql.Array;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Arrays;
 import java.util.UUID;
 
 import static Main.Main.db;
@@ -138,10 +136,25 @@ public class Player {
     }
 
     @GET
-    @Path("listCharacters")
+    @Path("listCharacters/{playerID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String listCharacters(){
-        JSONObject jso = new JSONObject();
-        PreparedStatement ps = db.prepareStatement("SELECT")
+    public String listCharacters(@PathParam("playerID")int playerID){
+        JSONArray list = new JSONArray();
+        try {
+            PreparedStatement ps = db.prepareStatement("SELECT characterId, characterName,class FROM characterSummaryInfo WHERE playerId=?");
+            ps.setInt(1,playerID);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                JSONObject jso = new JSONObject();
+                jso.put("characterID", rs.getInt(1));
+                jso.put("characterName", rs.getString(2));
+                jso.put("class",rs.getString(3));
+                list.add(jso);
+            }
+
+        }catch(Exception e){
+            return e.toString();
+        }
+        return list.toString();
     }
 }
