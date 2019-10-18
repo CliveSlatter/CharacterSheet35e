@@ -25,6 +25,7 @@ public class Player {
     @Produces(MediaType.APPLICATION_JSON)
     public String Login(@FormDataParam("username") String username,
                         @FormDataParam("password") String password){
+
         try{
             if(username==null || password==null) throw new Exception("Username or password is missing in the HTTP request.");
             System.out.println("player/login - Attempt by " + username + " " + password);

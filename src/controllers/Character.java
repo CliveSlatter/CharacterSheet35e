@@ -5,6 +5,7 @@ import org.json.simple.JSONObject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.awt.*;
@@ -17,6 +18,61 @@ import static Main.Main.db;
 
 @Path("character/")
 public class Character{
+
+    @GET
+    @Path("getdetails/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public static String GetCharacter(@PathParam("id") int id){
+        JSONArray abilities = new JSONArray();
+        JSONArray skills = new JSONArray();
+        JSONObject basics = new JSONObject();
+        try {
+            PreparedStatement psa = db.prepareStatement("SELECT characterAbilities.characterId,abilities.abilityName,characterAbilities.abilityPoints,abilityBonus.bonus FROM characterAbilities INNER JOIN abilities ON characterAbilities.abilityId=abilities.abilityId INNER JOIN abilityBonus ON characterAbilities.abilitypoints=abilityBonus.base WHERE characterAbilities.characterId=?");
+            PreparedStatement psb = db.prepareStatement("SELECT characterName,class,level,race,alignment,deity,size,age,gender,height,weight,eyes,hair,skin FROM characterSummaryInfo WHERE characterID = ?");
+            PreparedStatement pss = db.prepareStatement("SELECT characterskills.charID,skill.skillName, skill.keyAbility, CharacterSkills.points FROM skill INNER JOIN characterskills on skill.id=characterskills.skillID WHERE charid=?");
+            psa.setInt(1,id);
+            psb.setInt(1,id);
+            pss.setInt(1,id);
+            ResultSet rsa = psa.executeQuery();
+            ResultSet rsb = psb.executeQuery();
+            ResultSet rss = pss.executeQuery();
+            basics.put("characterName", rsa.getString(1));
+            basics.put("class", rsa.getString(2));
+            basics.put("level", rsa.getInt(3));
+            basics.put("race", rsa.getString(4));
+            basics.put("alignment", rsa.getString(5));
+            basics.put("deity", rsa.getString(6));
+            basics.put("size", rsa.getString(7));
+            basics.put("age", rsa.getString(8));
+            basics.put("gender", rsa.getString(9));
+            basics.put("height", rsa.getInt(10));
+            basics.put("weight", rsa.getInt(11));
+            basics.put("eyes", rsa.getString(12));
+            basics.put("hair", rsa.getString(13));
+            basics.put("skin", rsa.getString(14));
+
+            
+            while(rsa.next()){
+                JSONObject jso = new JSONObject();
+                jso.put("characterId",rsa.getInt(1));
+                jso.put("ability",rsa.getString(2));
+                jso.put("score",rsa.getInt(3));
+                jso.put("bonus",rsa.getInt(4));
+                abilities.add(jso);
+            }
+
+            while(rss.next()){
+                JSONObject jso = new JSONObject();
+                jso.put("skill",rss.getString(1));
+                jso.put("ability",rss.getString(2));
+                jso.put("points",rss.getInt(3));
+                skills.add(jso);
+            }
+        }catch(Exception e){
+            System.out.println(e);
+        }
+        return skills.toString();
+    }
 
 
     public static void AddCharacter(){
@@ -52,7 +108,12 @@ public class Character{
     }
 
     public static void RemoveCharacter(int playerID){
+        try{
+            PreparedStatement psb = db.prepareStatement("SELECT characterName,class,level,race,alignment,deity,size,age,gender,height,weight,eyes,hair,skin FROM characterSummaryInfo WHERE characterID = ?");
+            PreparedStatement psa = db.prepareStatement("SELECT characterAbilities.characterId, characterAbilities.abilityPoints FROM characterAbilities INNER JOIN abilities ON characterAbilities.abilityId=abilities.abilityId ");
+        }catch(Exception e){
 
+        }
     }
 
     @GET
