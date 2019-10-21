@@ -36,20 +36,20 @@ public class Character{
             ResultSet rsa = psa.executeQuery();
             ResultSet rsb = psb.executeQuery();
             ResultSet rss = pss.executeQuery();
-            basics.put("characterName", rsa.getString(1));
-            basics.put("class", rsa.getString(2));
-            basics.put("level", rsa.getInt(3));
-            basics.put("race", rsa.getString(4));
-            basics.put("alignment", rsa.getString(5));
-            basics.put("deity", rsa.getString(6));
-            basics.put("size", rsa.getString(7));
-            basics.put("age", rsa.getString(8));
-            basics.put("gender", rsa.getString(9));
-            basics.put("height", rsa.getInt(10));
-            basics.put("weight", rsa.getInt(11));
-            basics.put("eyes", rsa.getString(12));
-            basics.put("hair", rsa.getString(13));
-            basics.put("skin", rsa.getString(14));
+            basics.put("characterName", rsb.getString(1));
+            basics.put("class", rsb.getString(2));
+            basics.put("level", rsb.getInt(3));
+            basics.put("race", rsb.getString(4));
+            basics.put("alignment", rsb.getString(5));
+            basics.put("deity", rsb.getString(6));
+            basics.put("size", rsb.getString(7));
+            basics.put("age", rsb.getString(8));
+            basics.put("gender", rsb.getString(9));
+            basics.put("height", rsb.getInt(10));
+            basics.put("weight", rsb.getInt(11));
+            basics.put("eyes", rsb.getString(12));
+            basics.put("hair", rsb.getString(13));
+            basics.put("skin", rsb.getString(14));
 
             
             while(rsa.next()){
@@ -71,7 +71,7 @@ public class Character{
         }catch(Exception e){
             System.out.println(e);
         }
-        return skills.toString();
+        return basics.toString();
     }
 
 
