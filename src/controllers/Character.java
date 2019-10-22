@@ -8,8 +8,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.awt.*;
-import java.io.Console;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,17 +24,23 @@ public class Character{
     public static String GetCharacter(@PathParam("id") int id){
         JSONArray abilities = new JSONArray();
         JSONArray skills = new JSONArray();
+        JSONArray feats = new JSONArray();
         JSONObject basics = new JSONObject();
+        JSONObject character = new JSONObject();
         try {
             PreparedStatement psa = db.prepareStatement("SELECT characterAbilities.characterId,abilities.abilityName,characterAbilities.abilityPoints,abilityBonus.bonus FROM characterAbilities INNER JOIN abilities ON characterAbilities.abilityId=abilities.abilityId INNER JOIN abilityBonus ON characterAbilities.abilitypoints=abilityBonus.base WHERE characterAbilities.characterId=?");
             PreparedStatement psb = db.prepareStatement("SELECT characterName,class,level,race,alignment,deity,size,age,gender,height,weight,eyes,hair,skin FROM characterSummaryInfo WHERE characterID = ?");
             PreparedStatement pss = db.prepareStatement("SELECT characterskills.charID,skill.skillName, skill.keyAbility, CharacterSkills.points FROM skill INNER JOIN characterskills on skill.id=characterskills.skillID WHERE charid=?");
+            PreparedStatement psf = db.prepareStatement("SELECT CharacterFeats.featId, CharacterFeats.characterId, feats.featName from CharacterFeats inner join feats on CharacterFeats.featid = feats.featid WHERE characterId=?");
+
             psa.setInt(1,id);
             psb.setInt(1,id);
             pss.setInt(1,id);
+            psf.setInt(1,id);
             ResultSet rsa = psa.executeQuery();
             ResultSet rsb = psb.executeQuery();
             ResultSet rss = pss.executeQuery();
+            ResultSet rsf = psf.executeQuery();
             basics.put("characterName", rsb.getString(1));
             basics.put("class", rsb.getString(2));
             basics.put("level", rsb.getInt(3));
@@ -68,10 +73,22 @@ public class Character{
                 jso.put("points",rss.getInt(3));
                 skills.add(jso);
             }
+
+            while(rsf.next()){
+                JSONObject jso = new JSONObject();
+                jso.put("featName", rsf.getString(1));
+                feats.add(jso);
+            }
+            character.put("feats",feats);
+            character.put("skills",skills);
+            character.put("abilities", abilities);
+            character.put("basics",basics);
+
         }catch(Exception e){
             System.out.println(e);
         }
-        return basics.toString();
+        System.out.println(character.toString());
+        return character.toString();
     }
 
 
