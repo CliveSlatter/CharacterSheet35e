@@ -32,15 +32,18 @@ public class Character{
             PreparedStatement psb = db.prepareStatement("SELECT characterName,class,level,race,alignment,deity,size,age,gender,height,weight,eyes,hair,skin FROM characterSummaryInfo WHERE characterID = ?");
             PreparedStatement pss = db.prepareStatement("SELECT characterskills.charID,skill.skillName, skill.keyAbility, CharacterSkills.points FROM skill INNER JOIN characterskills on skill.id=characterskills.skillID WHERE charid=?");
             PreparedStatement psf = db.prepareStatement("SELECT CharacterFeats.featId, CharacterFeats.characterId, feats.featName from CharacterFeats inner join feats on CharacterFeats.featid = feats.featid WHERE characterId=?");
+            PreparedStatement pssa = db.prepareStatement("");
 
             psa.setInt(1,id);
             psb.setInt(1,id);
             pss.setInt(1,id);
             psf.setInt(1,id);
+            pssa.setInt(1,id);
             ResultSet rsa = psa.executeQuery();
             ResultSet rsb = psb.executeQuery();
             ResultSet rss = pss.executeQuery();
             ResultSet rsf = psf.executeQuery();
+            ResultSet rssa = pssa.executeQuery();
             basics.put("characterName", rsb.getString(1));
             basics.put("class", rsb.getString(2));
             basics.put("level", rsb.getInt(3));
