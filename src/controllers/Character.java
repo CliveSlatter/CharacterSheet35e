@@ -18,75 +18,20 @@ import static Main.Main.db;
 @Path("character/")
 public class Character{
 
+    private static String error;
+    private static PreparedStatement ps;
+    private static ResultSet rs;
+
     @GET
-    @Path("getdetails/{id}")
+    @Path("getCharacter/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public static String GetCharacter(@PathParam("id") int id){
-        JSONArray abilities = new JSONArray();
-        JSONArray skills = new JSONArray();
-        JSONArray feats = new JSONArray();
-        JSONObject basics = new JSONObject();
         JSONObject character = new JSONObject();
         try {
-            PreparedStatement psa = db.prepareStatement("SELECT characterAbilities.characterId,abilities.abilityName,characterAbilities.abilityPoints,abilityBonus.bonus FROM characterAbilities INNER JOIN abilities ON characterAbilities.abilityId=abilities.abilityId INNER JOIN abilityBonus ON characterAbilities.abilitypoints=abilityBonus.base WHERE characterAbilities.characterId=?");
-            PreparedStatement psb = db.prepareStatement("SELECT characterName,class,level,race,alignment,deity,size,age,gender,height,weight,eyes,hair,skin FROM characterSummaryInfo WHERE characterID = ?");
-            PreparedStatement pss = db.prepareStatement("SELECT characterskills.charID,skill.skillName, skill.keyAbility, CharacterSkills.points FROM skill INNER JOIN characterskills on skill.id=characterskills.skillID WHERE charid=?");
-            PreparedStatement psf = db.prepareStatement("SELECT CharacterFeats.featId, CharacterFeats.characterId, feats.featName from CharacterFeats inner join feats on CharacterFeats.featid = feats.featid WHERE characterId=?");
-            PreparedStatement pssa = db.prepareStatement("");
-
-            psa.setInt(1,id);
-            psb.setInt(1,id);
-            pss.setInt(1,id);
-            psf.setInt(1,id);
-            pssa.setInt(1,id);
-            ResultSet rsa = psa.executeQuery();
-            ResultSet rsb = psb.executeQuery();
-            ResultSet rss = pss.executeQuery();
-            ResultSet rsf = psf.executeQuery();
-            ResultSet rssa = pssa.executeQuery();
-            basics.put("characterName", rsb.getString(1));
-            basics.put("class", rsb.getString(2));
-            basics.put("level", rsb.getInt(3));
-            basics.put("race", rsb.getString(4));
-            basics.put("alignment", rsb.getString(5));
-            basics.put("deity", rsb.getString(6));
-            basics.put("size", rsb.getString(7));
-            basics.put("age", rsb.getString(8));
-            basics.put("gender", rsb.getString(9));
-            basics.put("height", rsb.getInt(10));
-            basics.put("weight", rsb.getInt(11));
-            basics.put("eyes", rsb.getString(12));
-            basics.put("hair", rsb.getString(13));
-            basics.put("skin", rsb.getString(14));
-
-            
-            while(rsa.next()){
-                JSONObject jso = new JSONObject();
-                jso.put("characterId",rsa.getInt(1));
-                jso.put("ability",rsa.getString(2));
-                jso.put("score",rsa.getInt(3));
-                jso.put("bonus",rsa.getInt(4));
-                abilities.add(jso);
-            }
-
-            while(rss.next()){
-                JSONObject jso = new JSONObject();
-                jso.put("skill",rss.getString(1));
-                jso.put("ability",rss.getString(2));
-                jso.put("points",rss.getInt(3));
-                skills.add(jso);
-            }
-
-            while(rsf.next()){
-                JSONObject jso = new JSONObject();
-                jso.put("featName", rsf.getString(1));
-                feats.add(jso);
-            }
-            character.put("feats",feats);
-            character.put("skills",skills);
-            character.put("abilities", abilities);
-            character.put("basics",basics);
-
+            character.put("feats", getFeats(id));
+            character.put("skills", getSkills(id));
+            character.put("abilities", getAbilities(id));
+            character.put("basics",getBasics(id));
         }catch(Exception e){
             System.out.println(e);
         }
@@ -95,9 +40,14 @@ public class Character{
     }
 
 
-    public static void AddCharacter(){
+    /*public static String AddCharacter(){
+        JSONObject basics = new JSONObject();
+        try{
 
-    }
+        }catch(Exception sql){
+
+        }
+    }*/
 
     public static void UpdateCharacter(){
 
@@ -134,6 +84,94 @@ public class Character{
         }catch(Exception e){
 
         }
+    }
+
+    public static String getBasics(int charId){
+       JSONObject basics = new JSONObject();
+       try{
+           ps = db.prepareStatement("SELECT characterName,class,level,race,alignment,deity,size,age,gender,height,weight,eyes,hair,skin FROM characterSummaryInfo WHERE characterID = ?");
+           ps.setInt(1, charId);
+           rs = ps.executeQuery();
+           basics.put("characterName", rs.getString(1));
+           basics.put("class", rs.getString(2));
+           basics.put("level", rs.getInt(3));
+           basics.put("race", rs.getString(4));
+           basics.put("alignment", rs.getString(5));
+           basics.put("deity", rs.getString(6));
+           basics.put("size", rs.getString(7));
+           basics.put("age", rs.getString(8));
+           basics.put("gender", rs.getString(9));
+           basics.put("height", rs.getInt(10));
+           basics.put("weight", rs.getInt(11));
+           basics.put("eyes", rs.getString(12));
+           basics.put("hair", rs.getString(13));
+           basics.put("skin", rs.getString(14));
+           return basics.toString();
+       }catch(Exception sql){
+           error = "Database error - can't select by id from 'Skills' table: " + sql.getMessage();
+       }
+        return "{'error': '" + error + "'}";
+    }
+
+    private static String getAbilities(int charId){
+        JSONArray abilities = new JSONArray();
+
+        try{
+            ps = db.prepareStatement("SELECT characterAbilities.characterId,abilities.abilityName,characterAbilities.abilityPoints,abilityBonus.bonus FROM characterAbilities INNER JOIN abilities ON characterAbilities.abilityId=abilities.abilityId INNER JOIN abilityBonus ON characterAbilities.abilitypoints=abilityBonus.base WHERE characterAbilities.characterId=?");
+            ps.setInt(1,charId);
+            rs = ps.executeQuery();
+            while(rs.next()){
+                JSONObject jso = new JSONObject();
+                jso.put("characterId",rs.getInt(1));
+                jso.put("ability",rs.getString(2));
+                jso.put("score",rs.getInt(3));
+                jso.put("bonus",rs.getInt(4));
+                abilities.add(jso);
+            }
+            return abilities.toString();
+        }catch(Exception sql){
+            error = "Database error - can't select by id from 'Skills' table: " + sql.getMessage();
+        }
+
+        return "{'error': '" + error + "'}";
+    }
+
+    private static String getFeats(int charId){
+        JSONArray feats = new JSONArray();
+        try{
+            ps = db.prepareStatement("SELECT CharacterFeats.featId, CharacterFeats.characterId, feats.featName from CharacterFeats inner join feats on CharacterFeats.featid = feats.featid WHERE characterId=?");
+            ps.setInt(1,charId);
+            rs = ps.executeQuery();
+            while(rs.next()){
+                JSONObject jso = new JSONObject();
+                jso.put("featName", rs.getString(1));
+                feats.add(jso);
+            }
+            return feats.toString();
+        }catch(Exception sql){
+            error = "Database error - can't select by id from 'Skills' table: " + sql.getMessage();
+        }
+        return "{'error': '" + error + "'}";
+    }
+
+    private static String getSkills(int charId){
+        JSONArray skills = new JSONArray();
+        try{
+            ps = db.prepareStatement("SELECT characterskills.charID,skill.skillName, skill.keyAbility, CharacterSkills.points FROM skill INNER JOIN characterskills on skill.id=characterskills.skillID WHERE charid=?");
+            ps.setInt(1,charId);
+            rs = ps.executeQuery();
+            while(rs.next()){
+                JSONObject jso = new JSONObject();
+                jso.put("skill",rs.getString(1));
+                jso.put("ability",rs.getString(2));
+                jso.put("points",rs.getInt(3));
+                skills.add(jso);
+            }
+            return skills.toString();
+        }catch(Exception sql){
+            error = "Database error - can't select by id from 'Skills' table: " + sql.getMessage();
+        }
+        return "{'error': '" + error + "'}";
     }
 
     @GET
@@ -178,9 +216,9 @@ public class Character{
         System.out.println("character/skills");
         JSONArray list = new JSONArray();
         try{
-            PreparedStatement ps = db.prepareStatement("SELECT skill.SkillName,skill.keyAbility, characterSkills.points from skill inner join characterSkills on characterskills.charID = skill.id WHERE CharacterSkills.charID=?");
+            ps = db.prepareStatement("SELECT skill.SkillName,skill.keyAbility, characterSkills.points from skill inner join characterSkills on characterskills.charID = skill.id WHERE CharacterSkills.charID=?");
             ps.setInt(1,1);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             while(rs.next()){
                 JSONObject jso = new JSONObject();
                 jso.put("skillName",rs.getString(1));
