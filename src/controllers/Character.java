@@ -3,10 +3,7 @@ package controllers;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import java.sql.PreparedStatement;
@@ -77,12 +74,23 @@ public class Character{
         return list.toString();
     }
 
-    public static void RemoveCharacter(int playerID){
-        try{
-            PreparedStatement psb = db.prepareStatement("SELECT characterName,class,level,race,alignment,deity,size,age,gender,height,weight,eyes,hair,skin FROM characterSummaryInfo WHERE characterID = ?");
-            PreparedStatement psa = db.prepareStatement("SELECT characterAbilities.characterId, characterAbilities.abilityPoints FROM characterAbilities INNER JOIN abilities ON characterAbilities.abilityId=abilities.abilityId ");
-        }catch(Exception e){
 
+    @POST
+    @Path("remove/{cid}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public static String RemoveCharacter(@PathParam("cid")Integer playerID){
+        try{
+            if(playerID==null){
+                System.out.println("Invalid or missing player ID");
+            }
+            PreparedStatement ps = db.prepareStatement("DELETE FROM characterSummaryInfo WHERE characterID = ?");
+            ps.setInt(1, playerID);
+            ps.executeUpdate();
+            return "{\"status\": \"OK\"}";
+        }catch(Exception e){
+            System.out.println("Database error: " + e.getMessage());
+            return "{\"error\": \"Unable to delete item, please see server console for more info.\"}";
         }
     }
 

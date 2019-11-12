@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="identifier.sqlite" uuid="6fd17bbd-2aed-4598-80be-e861b0e15d78">
+    <data-source source="LOCAL" name="identifier.sqlite" uuid="51f9a3ee-3874-4509-bb63-a535f808079d">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
@@ -9,29 +9,6 @@
       <driver-properties>
         <property name="enable_load_extension" value="true" />
       </driver-properties>
-    </data-source>
-    <data-source source="LOCAL" name="ADND35" uuid="7881d3dc-7ae5-4af7-9a02-2b8affd5660e">
-      <driver-ref>sqlite.xerial</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:U:\Computer Science 2018-19\Second Year\CharacterSheet\resources\ADND35.db</jdbc-url>
-      <driver-properties>
-        <property name="enable_load_extension" value="true" />
-      </driver-properties>
-      <libraries>
-        <library>
-          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.25.1/license.txt</url>
-        </library>
-        <library>
-          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.25.1/sqlite-jdbc-3.25.1.jar</url>
-        </library>
-        <library>
-          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.16.1/sqlite-jdbc-3.16.1.jar</url>
-        </library>
-        <library>
-          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.16.1/xerial-sqlite-license.txt</url>
-        </library>
-      </libraries>
     </data-source>
   </component>
 </project>
