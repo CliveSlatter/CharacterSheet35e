@@ -37,13 +37,13 @@ public class User {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             PasswordHash ph = generateStrongPasswordHash(password);
-            if(ph.getHash().equals(rs.getString("hash"))){
-                System.out.println("Passwords match");
-            }
+
 
             if (rs != null && rs.next()) {
-                if (!password.equals(rs.getString("Password"))) {
-                    return "{\"error\": \"Incorrect password\"}";
+                if(ph.getHash().equals(rs.getString("hash"))){
+                    System.out.println("Passwords match");
+                }else{
+                    return "{\"error\": \"Passwords don't match\"}";
                 }
 
                 String token = UUID.randomUUID().toString();
