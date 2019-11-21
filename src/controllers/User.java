@@ -26,15 +26,10 @@ public class User {
     @Produces(MediaType.APPLICATION_JSON)
     public String login(@FormDataParam("username") String username, @FormDataParam("password") String password){
         try{
-
-            // Checks if any of the user credentials is missing
-
             if(username==null || password == null){
                 throw new Exception("Either the username or password form data parameters are missing in the HTTP request.");
             }
             System.out.println("/user/login - Attempt by " + username);
-
-            // Finds the currently stored data about the user
 
             PreparedStatement ps = db.prepareStatement(
                     "SELECT Username, salt, hash, SessionToken FROM User WHERE Username = ?"
@@ -42,17 +37,13 @@ public class User {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
 
-            // Generates the hash for the password entered along with the stored salt
+            PasswordHash ph = generateStrongPasswordHash(password, rs.getBytes(2));
 
-            PasswordHash ph = generateStrongPasswordHash(password,rs.getBytes(2));
 
             if (rs != null && rs.next()) {
-                if (!ph.getHash().equals(rs.getString(3))) {
+                if (!ph.getHash().equals(rs.getString("hash"))) {
                     return "{\"error\": \"Incorrect password\"}";
                 }
-
-                // Generates the session token after the user has logged in and
-                // updated the user's record with the current token
 
                 String token = UUID.randomUUID().toString();
                 PreparedStatement statement2 = db.prepareStatement(
@@ -82,25 +73,14 @@ public class User {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public String CreateUser(@FormDataParam("username") String username,@FormDataParam("password") String password){
+        System.out.println("New user created!!");
         try{
-
-            // Checks if any of the information required has not been sent
 
             if(username == null || password == null){
                 throw new Exception("Either the username or password form data parameters are missing in the HTTP request.");
             }
-
-            // Generates the password hash using the password provided and the salt generated
-            // in the getSalt() method
-
             PasswordHash ph = generateStrongPasswordHash(password, getSalt());
-
-            // Creates a session token for the user when moving onto the next page of the website
-
             String token = UUID.randomUUID().toString();
-
-            // Adds the new record to the User table
-
             PreparedStatement ps = db.prepareStatement("Insert into user(username,salt,hash,sessionToken) VALUES (?,?,?,?)");
             ps.setString(1,username);
             ps.setBytes(2,ph.getSalt());
@@ -120,11 +100,11 @@ public class User {
         int iterations = 1000;
         char[] chars = password.toCharArray();
 
-
         PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
         SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         byte[] hash = skf.generateSecret(spec).getEncoded();
-        return new PasswordHash(salt,toHex(hash));
+        PasswordHash ph = new PasswordHash(salt,toHex(hash));
+        return ph;
     }
 
     private static byte[] getSalt() throws NoSuchAlgorithmException
