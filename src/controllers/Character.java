@@ -4,13 +4,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
-import static Main.Main.db;
+import static controllers.User.validateCurrentPlayer;
+import static main.Main.db;
 
 @Path("character/")
 public class Character{
@@ -29,10 +29,11 @@ public class Character{
             character.put("skills", getSkills(id));
             character.put("abilities", getAbilities(id));
             character.put("basics",getBasics(id));
+            character.put("weapons", getWeapons(id));
         }catch(Exception e){
             System.out.println(e);
         }
-        System.out.println(character.toString());
+        //System.out.println(character.toString());
         return character.toString();
     }
 
@@ -43,7 +44,7 @@ public class Character{
 
         }catch(Exception sql){
 
-        }
+        }6
     }*/
 
     public static void UpdateCharacter(){
@@ -53,10 +54,16 @@ public class Character{
     @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
-    public String ListCharacters(){
+    public String ListCharacters(@CookieParam("sessionToken") Cookie sessionCookie){
         System.out.println("character/list");
         JSONArray list = new JSONArray();
         try {
+            String currentPlayer = validateCurrentPlayer(sessionCookie);
+
+            if (currentPlayer == null) {
+                return "{\"error\": \"Not logged in as valid player\"}";
+            }
+
             PreparedStatement ps = db.prepareStatement("SELECT characterId, characterName, class  FROM characterSummaryInfo WHERE playerId=?");
             ps.setInt(1,1);
             ResultSet rs = ps.executeQuery();
@@ -178,6 +185,45 @@ public class Character{
             return skills.toString();
         }catch(Exception sql){
             error = "Database error - can't select by id from 'Skills' table: " + sql.getMessage();
+        }
+        return "{'error': '" + error + "'}";
+    }
+
+    private static String getArmour(int id){
+        JSONArray armour = new JSONArray();
+        try{
+            ps = db.prepareStatement("");
+            ps.setInt(1,id);
+            rs = ps.executeQuery();
+            while(rs.next()){
+                JSONObject jso = new JSONObject();
+
+                armour.add(jso);
+            }
+            return armour.toString();
+        }catch(Exception sql){
+            error = "Database error - can't select by id from 'CharacterArmour' table: " + sql.getMessage();
+        }
+        return "{'error': '" + error + "'}";
+    }
+
+    private static String getWeapons(int id){
+        JSONArray weapons = new JSONArray();
+        try{
+            ps = db.prepareStatement("select weapons.name, weapons.rangeIncrement, weapons.crit, weapons.type from weapons join characterweapons on weapons.weaponId = characterweapons.weaponId where characterweapons.charId=?");
+            ps.setInt(1,id);
+            rs = ps.executeQuery();
+            while(rs.next()) {
+                JSONObject jso = new JSONObject();
+                jso.put("name",rs.getInt(1));
+                jso.put("range",rs.getString(2));
+                jso.put("crit",rs.getString(3));
+                jso.put("type",rs.getString(4));
+                weapons.add(jso);
+            }
+            return weapons.toString();
+        }catch(Exception sql){
+            error = "Database error - can't select by id from 'CharacterWeapons' table: " + sql.getMessage();
         }
         return "{'error': '" + error + "'}";
     }

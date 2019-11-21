@@ -15,7 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.UUID;
 
-import static Main.Main.db;
+import static main.Main.db;
 
 @Path("player/")
 public class Player {

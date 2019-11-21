@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import static Main.Main.db;
+import static main.Main.db;
 
 @Path("skills/")
 public class CharacterSkills {
