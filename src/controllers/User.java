@@ -26,10 +26,16 @@ public class User {
     @Produces(MediaType.APPLICATION_JSON)
     public String login(@FormDataParam("username") String username, @FormDataParam("password") String password){
         try{
+
+            // Checks if either of the two parameters are empty
+
             if(username==null || password == null){
                 throw new Exception("Either the username or password form data parameters are missing in the HTTP request.");
             }
             System.out.println("/user/login - Attempt by " + username);
+
+            // Gets the relevant information from the User class i.e. the salt and the hash for the password
+            // The salt is needed to add to the submitted password when creating the hash again
 
             PreparedStatement ps = db.prepareStatement(
                     "SELECT Username, salt, hash, SessionToken FROM User WHERE Username = ?"
@@ -37,25 +43,28 @@ public class User {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
 
-            PasswordHash ph = generateStrongPasswordHash(password, rs.getBytes(2));
 
+
+            // Compares the stored hash against the newly recreated hash which should match
 
             if (rs != null && rs.next()) {
+                PasswordHash ph = generateStrongPasswordHash(password, rs.getBytes(2)); // Creates the hash of the submitted password
                 if (!ph.getHash().equals(rs.getString("hash"))) {
                     return "{\"error\": \"Incorrect password\"}";
                 }
 
+                // Creates the new session token before updating the current user's details
                 String token = UUID.randomUUID().toString();
-                PreparedStatement statement2 = db.prepareStatement(
-                        "UPDATE user SET SessionToken = ? WHERE username = ?"
-                );
+                PreparedStatement statement2 = db.prepareStatement("UPDATE user SET SessionToken = ? WHERE username = ?");
                 statement2.setString(1, token);
                 statement2.setString(2, username);
                 statement2.executeUpdate();
+
+                // returns the current token to the calling method
                 return "{\"token\": \"" + token + "\"}";
 
             } else {
-                return "{\"error\": \"Can't find user account.\"}";
+                return "{\"error\": \"Can't find player account.\"}";
             }
         }catch(Exception e){
             String error = "Database error - can't process login: " + e.getMessage();
@@ -64,15 +73,29 @@ public class User {
         }
     }
 
+    @POST
+    @Path("logout")
     public void logout(@CookieParam("sessionToken")Cookie sessionToken){
+        System.out.println("/admin/logout - Logging out user");
 
+        if (sessionToken != null) {
+            String token = sessionToken.getValue();
+            try {
+                PreparedStatement statement = db.prepareStatement("Update user SET SessionToken = NULL WHERE SessionToken = ?");
+                statement.setString(1, token);
+                statement.executeUpdate();
+            } catch (Exception resultsException) {
+                String error = "Database error - can't update 'User' table: " + resultsException.getMessage();
+                System.out.println(error);
+            }
+        }
     }
 
     @POST
     @Path("create")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String CreateUser(@FormDataParam("username") String username,@FormDataParam("password") String password){
+    public String CreatePlayer(@FormDataParam("username") String username,@FormDataParam("password") String password){
         System.out.println("New user created!!");
         try{
 
@@ -97,25 +120,29 @@ public class User {
 
     private static PasswordHash generateStrongPasswordHash(String password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException
     {
-        int iterations = 1000;
-        char[] chars = password.toCharArray();
+
+
+        int iterations = 1000; // the number of times the password is hashed producing a symmetric key
+        char[] chars = password.toCharArray(); // converts the password into an array so that it can be used by PBEKeySpec
 
         PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
         SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        byte[] hash = skf.generateSecret(spec).getEncoded();
-        PasswordHash ph = new PasswordHash(salt,toHex(hash));
-        return ph;
+        byte[] hash = skf.generateSecret(spec).getEncoded(); // produces the final hash to be stored
+        // creates and returns an object with the hash information needed to be stored in the table User
+        return new PasswordHash(salt,toHex(hash));
     }
 
     private static byte[] getSalt() throws NoSuchAlgorithmException
     {
+        // Generates a random salt to be used with the password for hashing
+
         SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
         byte[] salt = new byte[16];
         sr.nextBytes(salt);
         return salt;
     }
 
-    private static String toHex(byte[] array) throws NoSuchAlgorithmException
+    private static String toHex(byte[] array)
     {
         BigInteger bi = new BigInteger(1, array);
         String hex = bi.toString(16);

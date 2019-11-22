@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/client/css/login.css">
+    <script src="/client/js/index.js"></script>
+    <style>
+
+    </style>
+</head>
+<body onload="pageLoad()">
+
+<h1 style="text-align: center">Advanced D&D 3.5 Character Generator</h1>
+
+<div class="container">
+    <div class="row">
+        <h2 style="text-align:center">Login with Social Media or Manually</h2>
+    </div>
+
+    <div class="row">
+        <div class="social">
+            <form id="socialMedia">
+                <div class="form-group">
+                    <a href="#" class="fb btn">
+                        <i class="fa fa-facebook fa-fw"></i> Login with Facebook
+                    </a>
+                    <a href="#" class="twitter btn">
+                        <i class="fa fa-twitter fa-fw"></i> Login with Twitter
+                    </a>
+                    <a href="#" class="google btn"><i class="fa fa-google fa-fw">
+                    </i> Login with Google
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="create">
+            <form id="newUserForm">
+                <div class="form-group">
+                    <label>Username<input type="text" name="username" placeholder="Username" required></label>
+                    <label>First name<input type="text" name="firstName" placeholder="First name" required></label>
+                    <label>Last name<input type="text" name="lastName" placeholder="Last name" required></label>
+                    <label>Password<input type="password" name="password" placeholder="Password" required></label>
+                    <label>Re-enter Password<input type="password" name="password2" placeholder="Re-enter Password"
+                                                   required></label>
+                </div>
+                <button class="btn btn-lg btn-success">Create user account</button>
+            </form>
+        </div>
+
+        <div class="login">
+            <form id="loginForm">
+                <label class="form-group">
+                    <label>Username<input type="text" name="username" placeholder="Username" required></label>
+                    <label>Password</label><input type="password" name="password" placeholder="Password"
+                                                  required></label>
+                <button class="btn btn-lg btn-primary">Log in</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+</body>
+</html>
