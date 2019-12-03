@@ -1,4 +1,4 @@
-package controllers;
+package Controllers;
 
 import models.PasswordHash;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -18,7 +18,7 @@ import java.util.UUID;
 
 import static main.Main.db;
 
-@Path("user/")
+@Path("user")
 public class User {
     @POST
     @Path("login")
@@ -158,6 +158,7 @@ public class User {
     public static String validateCurrentPlayer(Cookie sessionCookie){
         if (sessionCookie != null) {
             String token = sessionCookie.getValue();
+            System.out.println(token);
             try {
                 PreparedStatement statement = db.prepareStatement("SELECT Username FROM User WHERE SessionToken = ?");
                 statement.setString(1, token);

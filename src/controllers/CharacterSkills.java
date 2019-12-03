@@ -1,4 +1,4 @@
-package controllers;
+package Controllers;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -7,7 +7,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 

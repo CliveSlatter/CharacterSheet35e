@@ -19,9 +19,9 @@ function pageLoad() {
 }
 
 function resetLoginForm() {
-    if (Cookies.get("destination") === undefined) {
-        window.location.href = "/client/index.html";
-    }
+    /*if (Cookies.get("destination") === undefined) {
+        window.location.href = "/client/CharacterList.html";
+    }*/
 
     const loginForm = document.getElementById('loginForm');
 
@@ -37,7 +37,7 @@ function resetLoginForm() {
                     alert(data.error);
                 } else {
                     Cookies.set("sessionToken", data.token);
-                    window.location.href = Cookies.get("destination");
+                    window.location.href = "/client/CharacterList.html"; //Cookies.get("destination");
                 }
             }
         );

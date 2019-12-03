@@ -1,4 +1,4 @@
-package controllers;
+package Controllers;
 
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.simple.JSONArray;

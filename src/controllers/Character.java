@@ -1,4 +1,4 @@
-package controllers;
+package Controllers;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -9,7 +9,7 @@ import javax.ws.rs.core.MediaType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import static controllers.User.validateCurrentPlayer;
+import static Controllers.User.validateCurrentPlayer;
 import static main.Main.db;
 
 @Path("character/")
