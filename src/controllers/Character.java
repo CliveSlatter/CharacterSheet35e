@@ -57,6 +57,7 @@ public class Character{
     public String ListCharacters(@CookieParam("sessionToken") Cookie sessionCookie){
         System.out.println("character/list");
         JSONArray list = new JSONArray();
+        JSONObject characters = new JSONObject();
         try {
             String currentPlayer = validateCurrentPlayer(sessionCookie);
 
@@ -74,6 +75,8 @@ public class Character{
                 jso.put("class", rs.getString(3));
                 list.add(jso);
             }
+            characters.put("characters",list);
+            return characters.toString();
 
         }catch (Exception sql){
             System.out.println(sql);

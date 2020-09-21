@@ -1,16 +1,55 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 
 <head>
-    <title>Demo page</title>
-    <link rel="stylesheet" type="text/css" href="/client/css/index.css">
-    <script src="/client/js/login.js"></script>
+
+    <title>Character List</title>
+
+
+    <script src="/client/js/js.cookie.min.js"></script>
+
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="/client/js/Character.js"></script>
+
 </head>
 
-<body onlo>
-<div id="content">
-    <div id="testDiv"></div>
+<body class="bg-dark" onload="pageLoad()">
+
+<div class="container bg-white">
+
+    <div class="jumbotron text-center">
+        <div class="font-italic text-secondary">
+            Current characters for <span id="playerName" style="text-emphasis: black">...</span>
+            <button id="logout" class="btn btn-sm btn-outline-danger ml-2">
+                Log out
+            </button>
+        </div>
+    </div>
+
+    <div id="characters">
+    </div>
+
+    <div class="container p-3">
+
+        <form class="needs-validation" id="characterForm">
+            <div class="form-group form-row">
+                <div class="col-11">
+                    <label class="w-100">Character name<input class="form-control input-lg" name="characterDetails" required />
+                    </label>
+                </div>
+                <div class="col-1">
+                    <button id="characterSubmit" class="btn btn-success mt-4">New Character</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+
 </div>
+
 </body>
 
 </html>
